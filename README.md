@@ -51,7 +51,6 @@ backupify --db <db> --user <user> --password <password> --host <host> --port <po
 ### Example
 
 ```bash
-Copy code
 backupify --db mysql --user root --password mypassword --host localhost --port 3306 --dbname mydb --compress --cloud
 
 ```
@@ -71,7 +70,6 @@ This will back up the `mydb` MySQL database running on `localhost` to a compress
 - **Full Backup (with compression)**:
 
   ```bash
-  Copy code
   backupify --db mysql --user root --password secret --host localhost --port 3306 --dbname mydb --compress
 
   ```
@@ -79,7 +77,6 @@ This will back up the `mydb` MySQL database running on `localhost` to a compress
 - **Backup to Cloud (coming soon)**:
 
   ```bash
-  Copy code
   backupify --db postgres --user admin --password secret --host localhost --port 5432 --dbname testdb --compress --cloud
 
   ```

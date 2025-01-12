@@ -285,28 +285,28 @@ async function sendDesktopNotification(title, message, wait = false) {
 
     exec(`powershell -Command "${script}"`, (error, stdout, stderr) => {
       if (error) {
-        console.error(`Error sending Windows notification: ${error.message}`);
+        winston.error(`Error sending Windows notification: ${error.message}`);
         return;
       }
       if (stderr) {
-        console.error(`stderr: ${stderr}`);
+        winston.error(`stderr: ${stderr}`);
         return;
       }
-      console.log("Windows notification sent:", title, message);
+      winston.info(`Windows notification sent: ${title}, ${message}`);
     });
   } else if (platform === "darwin") {
     const script = `osascript -e 'display notification "${message}" with title "${title}"'`;
 
     exec(script, (error, stdout, stderr) => {
       if (error) {
-        console.error(`Error sending macOS notification: ${error.message}`);
+        winston.error(`Error sending macOS notification: ${error.message}`);
         return;
       }
       if (stderr) {
-        console.error(`stderr: ${stderr}`);
+        winston.error(`stderr: ${stderr}`);
         return;
       }
-      console.log("macOS notification sent:", title, message);
+      winston.info(`macOS notification sent: ${title}, ${message}`);
     });
   } else if (platform === "linux") {
     notifier.notify({
@@ -315,9 +315,9 @@ async function sendDesktopNotification(title, message, wait = false) {
       sound: true,
       wait: wait,
     });
-    console.log("Linux notification sent:", title, message);
+    winston.info(`Linux notification sent: ${title}, ${message}`);
   } else {
-    console.error("Unsupported OS:", platform);
+    winston.error(`Unsupported OS: ${platform}`);
   }
 }
 
