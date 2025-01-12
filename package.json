@@ -1,6 +1,6 @@
 {
   "name": "backupify-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A cli tool to backup MySQL, PostgreSQL, MongoDB databases with options for compression and cloud upload.",
   "main": "src/db.js",
   "bin": {
