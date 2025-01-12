@@ -8,7 +8,7 @@ const backup = require("../src/db");
 const program = new Command();
 
 program
-  .command("backup")
+  .command("backupify-cli")
   .description("Backup the database")
   .option("-d, --db <db>", "Database type (mysql, postgres, mongodb, sqlite)")
   .option("-u, --user <user>", "Username for the database")
