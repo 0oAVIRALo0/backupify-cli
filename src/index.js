@@ -15,7 +15,7 @@ program
   .option("-n, --dbname <dbname>", "Database name")
   .option("-t, --type <type>", "Backup type (full, incremental, differential)")
   .option("-c, --compress", "Compress the backup file")
-  // .option("--cloud", "Upload the backup to cloud storage")
+  .option("--cloud", "Upload the backup to cloud storage")
   .action(backup.backup);
 
 program.parse(process.argv);
