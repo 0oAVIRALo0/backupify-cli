@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 const { Command } = require("commander");
-const backup = require("./db");
+const dotenv = require("dotenv");
+
+dotenv.config();
+const backup = require("../src/db");
 const program = new Command();
 
 program

@@ -5,6 +5,10 @@ const winston = require("winston");
 const mysqldump = require("mysqldump");
 const fs = require("fs");
 const archiver = require("archiver");
+const notifier = require("node-notifier");
+const os = require("os");
+const { exec } = require("child_process");
+const path = require("path");
 
 winston.add(
   new winston.transports.Console({
@@ -52,9 +56,26 @@ async function backup({
   try {
     connection = await connectToDatabase(db, dbConfig);
     winston.info("Connected to the database");
+
+    // Send notification that backup has started
+    await sendDesktopNotification(
+      "Backup Started",
+      `Starting backup for database ${dbname}.`
+    );
+
     await createBackup(db, connection, dbname, compress, cloud);
+
+    // Send notification that backup has completed
+    await sendDesktopNotification(
+      "Backup Completed",
+      `Backup completed for database ${dbname}.`
+    );
   } catch (err) {
     winston.error("Error during backup process:", err);
+    await sendDesktopNotification(
+      "Backup Failed",
+      `Backup failed for database ${dbname}. Error: ${err.message}`
+    );
   } finally {
     if (db === "mysql" || db === "postgres") {
       connection.end();
@@ -80,10 +101,21 @@ async function createBackup(
   cloud = false
 ) {
   try {
+    const homeDirectory = os.homedir();
+    const downloadsDirectory = path.join(homeDirectory, "Downloads");
     const backupFileName = `${dbname}-backup.sql`;
     const compressedFileName = `${dbname}-backup.zip`;
-    const outputFilePath = compress ? compressedFileName : backupFileName;
 
+    const outputFilePath = compress
+      ? path.join(downloadsDirectory, compressedFileName)
+      : path.join(downloadsDirectory, backupFileName);
+
+    // Make sure the directory exists (it should by default on most systems)
+    if (!fs.existsSync(downloadsDirectory)) {
+      fs.mkdirSync(downloadsDirectory);
+    }
+
+    // Create backup based on DB type
     if (dbType === "mysql") {
       const mysqlConfig = {
         host: connection.config.host,
@@ -97,13 +129,13 @@ async function createBackup(
         connection: mysqlConfig,
         dumpToFile: outputFilePath,
       });
-      winston.info(`MySQL backup complete. File saved as: ${outputFilePath}`);
+      winston.info(`MySQL backup complete. File saved to: ${outputFilePath}`);
     } else if (dbType === "postgres") {
       const query = `COPY (SELECT * FROM pg_catalog.pg_tables WHERE schemaname = 'public') TO STDOUT WITH CSV HEADER`;
       const result = await connection.query(query);
       fs.writeFileSync(outputFilePath, result.rows.join("\n"));
       winston.info(
-        `PostgreSQL backup complete. File saved as: ${outputFilePath}`
+        `PostgreSQL backup complete. File saved to: ${outputFilePath}`
       );
     } else if (dbType === "mongodb") {
       const db = connection.db(dbname);
@@ -114,14 +146,24 @@ async function createBackup(
         data.push({ collection: collection.collectionName, docs });
       }
       fs.writeFileSync(outputFilePath, JSON.stringify(data, null, 2));
-      winston.info(`MongoDB backup complete. File saved as: ${outputFilePath}`);
+      winston.info(`MongoDB backup complete. File saved to: ${outputFilePath}`);
     }
 
+    // If compressing the backup file, zip it
     if (compress) {
-      await compressBackupFile(outputFilePath, compressedFileName);
-      winston.info(`Backup compressed to: ${compressedFileName}`);
+      await compressBackupFile(
+        outputFilePath,
+        path.join(downloadsDirectory, compressedFileName)
+      );
+      winston.info(
+        `Backup compressed to: ${path.join(
+          downloadsDirectory,
+          compressedFileName
+        )}`
+      );
     }
 
+    // Optionally upload to cloud
     if (cloud) {
       await uploadToCloud(outputFilePath);
       winston.info(`Backup uploaded to the cloud: ${outputFilePath}`);
@@ -220,6 +262,63 @@ async function connectToDatabase(dbType, config) {
   }
 
   return connection;
+}
+
+/**
+ * Function to send a desktop notification based on the user's OS.
+ * @param {string} title - The title of the notification.
+ * @param {string} message - The message of the notification.
+ * @param {boolean} [wait=false] - Whether to wait for the user to click the notification (default is false).
+ */
+async function sendDesktopNotification(title, message, wait = false) {
+  if (!message) {
+    message = "No message provided";
+  }
+
+  const platform = os.platform();
+
+  if (platform === "win32") {
+    const script = `
+      $wshell = New-Object -ComObject WScript.Shell
+      $wshell.Popup("${message}", 0, "${title}", 0x0)
+    `;
+
+    exec(`powershell -Command "${script}"`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error sending Windows notification: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+        return;
+      }
+      console.log("Windows notification sent:", title, message);
+    });
+  } else if (platform === "darwin") {
+    const script = `osascript -e 'display notification "${message}" with title "${title}"'`;
+
+    exec(script, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error sending macOS notification: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+        return;
+      }
+      console.log("macOS notification sent:", title, message);
+    });
+  } else if (platform === "linux") {
+    notifier.notify({
+      title: title,
+      message: message,
+      sound: true,
+      wait: wait,
+    });
+    console.log("Linux notification sent:", title, message);
+  } else {
+    console.error("Unsupported OS:", platform);
+  }
 }
 
 module.exports = { backup };
