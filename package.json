@@ -4,7 +4,7 @@
   "description": "A cli tool to backup MySQL, PostgreSQL, MongoDB databases with options for compression and cloud upload.",
   "main": "src/db.js",
   "bin": {
-    "backup": "bin/index.js"
+    "backupify-cli": "bin/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
