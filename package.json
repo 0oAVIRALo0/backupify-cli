@@ -1,26 +1,42 @@
 {
-  "name": "backupify",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "backupify-cli",
+  "version": "1.0.3",
+  "description": "A cli tool to backup MySQL, PostgreSQL, MongoDB databases with options for compression and cloud upload.",
+  "main": "src/db.js",
+  "bin": {
+    "backupify-cli": "bin/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "start": "node bin/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "backup",
+    "database",
+    "mysql",
+    "postgres",
+    "mongodb",
+    "compression",
+    "cloud"
+  ],
+  "author": "Aviral Chauhan",
+  "license": "MIT",
   "dependencies": {
     "archiver": "^7.0.1",
+    "axios": "^1.7.9",
     "commander": "^13.0.0",
+    "dotenv": "^16.4.7",
+    "https": "^1.0.0",
     "mongodb": "^6.12.0",
     "mysql2": "^3.12.0",
     "mysqldump": "^3.2.0",
+    "node-notifier": "^10.0.1",
     "pg": "^8.13.1",
     "sqlite3": "^5.1.7",
     "winston": "^3.17.0"
   },
-  "bin": {
-    "backupify": "src/index.js"
+  "devDependencies": {},
+  "engines": {
+    "node": ">=12.0.0"
   }
 }
