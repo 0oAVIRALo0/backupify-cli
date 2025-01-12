@@ -1,4 +1,4 @@
-# backupify
+# backupify-cli
 
 A simple command-line tool to back up MySQL, PostgreSQL, and MongoDB databases. It supports options for compression and cloud storage upload.
 
@@ -7,32 +7,17 @@ A simple command-line tool to back up MySQL, PostgreSQL, and MongoDB databases. 
 To install this package globally, run the following command:
 
 ```bash
-npm install -g backupify
+npm install -g backupify-cli
 ```
 
 ## Usage
 
-backupify --db <db> --user <user> --password <password> --host <host> --port <port> --dbname <dbname> --compress --cloud
-
-# backupify
-
-A simple command-line tool to back up MySQL, PostgreSQL, and MongoDB databases. It supports options for compression and cloud storage upload.
-
-## Installation
-
-To install this package globally, run the following command:
-
-```bash
-npm install -g backupify
-
-```
-
-## Usage
+backupify-cli --db <db> --user <user> --password <password> --host <host> --port <port> --dbname <dbname> --compress --cloud
 
 ### Backing up the database
 
 ```bash
-backupify --db <db> --user <user> --password <password> --host <host> --port <port> --dbname <dbname> --compress --cloud
+backupify-cli --db <db> --user <user> --password <password> --host <host> --port <port> --dbname <dbname> --compress --cloud
 
 ```
 
@@ -51,7 +36,7 @@ backupify --db <db> --user <user> --password <password> --host <host> --port <po
 ### Example
 
 ```bash
-backupify --db mysql --user root --password mypassword --host localhost --port 3306 --dbname mydb --compress --cloud
+backupify-cli --db mysql --user root --password mypassword --host localhost --port 3306 --dbname mydb --compress --cloud
 
 ```
 
@@ -70,14 +55,14 @@ This will back up the `mydb` MySQL database running on `localhost` to a compress
 - **Full Backup (with compression)**:
 
   ```bash
-  backupify --db mysql --user root --password secret --host localhost --port 3306 --dbname mydb --compress
+  backupify-cli --db mysql --user root --password secret --host localhost --port 3306 --dbname mydb --compress
 
   ```
 
 - **Backup to Cloud (coming soon)**:
 
   ```bash
-  backupify --db postgres --user admin --password secret --host localhost --port 5432 --dbname testdb --compress --cloud
+  backupify-cli --db postgres --user admin --password secret --host localhost --port 5432 --dbname testdb --compress --cloud
 
   ```
 
